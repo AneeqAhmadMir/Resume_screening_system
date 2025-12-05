@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hire Smart</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+    html {
+        scroll-behavior: smooth;
+    }
+    .card-section {
+        min-height: 300px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    body {
+        background-image: url("{{ url_for('static', filename='images/resume_bg_image.png') }}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        color: #fff;
+    }
+    .container {
+        background-color: rgba(0, 0, 0, 0.6);
+        border-radius: 8px;
+        padding: 20px;
+    }
+</style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background-color:  #2f2f2f;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('matchresume') }}">HireSmart</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#uploadResumes">Add Resumes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#jobDescriptionSection">Job Detail</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#matchButtonSection"> Get Results</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content container -->
+    <div class="container my-5">
+        <h1 class="mb-4 text-center">AI Powered Resume Screening System</h1>
+
+        {% if message %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <form action="{{ url_for('matcher') }}" method="POST" enctype="multipart/form-data">
+
+            <!-- Job Description Section -->
+            <div id="jobDescriptionSection" class="card card-section shadow-sm">
+                <div class="card-body">
+                    <label for="jobDescription" class="form-label fw-bold">Job Description</label>
+                    <textarea class="form-control" id="jobDescription" name="job_description" rows="6" required
+                              placeholder="Paste the job description here...">{{ request.form.job_description }}</textarea>
+                </div>
+            </div>
+
+            <!-- Upload Resumes Section -->
+            <div id="uploadResumes" class="card card-section shadow-sm">
+                <div class="card-body">
+                    <label for="resumeFiles" class="form-label fw-bold">Add Resumes</label>
+                    <input class="form-control" type="file" id="resumeFiles" name="resumes" multiple accept=".pdf,.docx,.txt" required />
+                    <div class="form-text">Accepted formats: PDF, DOCX, TXT</div>
+                </div>
+            </div>
+
+            <!-- Match Button Section -->
+            <div id="matchButtonSection" class="mb-3 text-center">
+                <button type="submit" class="btn btn-dark btn-lg px-5">Get Results</button>
+
+            </div>
+        </form>
+
+        {% if top_results %}
+        <div class="mt-5">
+            <h3>Top Matching Resumes</h3>
+           <table class="table table-hover mt-3">
+    <thead class="table-light">
+        <tr>
+            <th>Resume Filename</th>
+            <th>Match Score</th>
+            <th>Predicted Category</th>
+            <th>Download</th> <!-- New column -->
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for filename, score, category in top_results %}
+        <tr>
+            <td>{{ filename }}</td>
+            <td>{{ score }}</td>
+            <td>{{ category }}</td>
+            <td>
+                <a href="{{ url_for('uploaded_file', filename=filename) }}" class="btn btn-sm btn-outline-primary" download>
+                    Download
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
